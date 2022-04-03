@@ -4,10 +4,10 @@ object PNCounter {
   def empty[ReplicaId] = new PNCounter[ReplicaId]()
 }
 
-class PNCounter[ReplicaId] private[crdt] (
+case class PNCounter[ReplicaId] private[crdt] (
     private val increments: GCounter[ReplicaId] = GCounter.empty[ReplicaId],
     private val decrements: GCounter[ReplicaId] = GCounter.empty[ReplicaId]
-) {
+) extends CRDT[PNCounter[ReplicaId]] {
   def value = increments.value - decrements.value
   def inc(replicaId: ReplicaId) =
     new PNCounter(increments.inc(replicaId), decrements)

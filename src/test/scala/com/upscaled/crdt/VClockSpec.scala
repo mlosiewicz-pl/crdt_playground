@@ -1,9 +1,10 @@
 package com.upscaled.crdt
 
+import org.scalacheck.Gen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class VClockSpec extends AnyFlatSpec with Matchers {
+class VClockSpec extends AnyFlatSpec with Matchers with CRDTBehaviors{
 
   "Vector Clock" should "compare with another" in {
     val v1 = VClock.empty[String].inc("1").inc("2")
@@ -14,5 +15,13 @@ class VClockSpec extends AnyFlatSpec with Matchers {
     v2.inc("2").compare(v1) should equal(Ord.Eq)
     v2.inc("1").inc("1").compare(v1) should equal(Ord.Cc)
   }
+
+  it should behave like lawfulCRDT[VClock[String]](
+    () => VClock.empty[String],
+    cnt => {
+      val replica = Gen.oneOf(Seq("1", "2", "3")).sample.get
+      cnt.inc(replica)
+    }
+  )
 
 }

@@ -5,9 +5,9 @@ object VClock {
 
 }
 
-class VClock[ReplicaId] private[crdt] (
+case class VClock[ReplicaId] private[crdt] (
     private val cnt: GCounter[ReplicaId] = GCounter.empty[ReplicaId]
-) {
+) extends CRDT[VClock[ReplicaId]] {
   def inc(replicaId: ReplicaId): VClock[ReplicaId] = new VClock(
     cnt.inc(replicaId)
   )
@@ -17,12 +17,12 @@ class VClock[ReplicaId] private[crdt] (
   def compare(other: VClock[ReplicaId]): Ord = {
     val keys: Set[ReplicaId] =
       (cnt.underlying.keys ++ other.cnt.underlying.keys).toSet
-    keys.foldLeft(Ord.Eq){
+    keys.foldLeft(Ord.Eq) {
       case (Ord.Eq, k) if cnt.underlying.getOrElse(k, Zero) > other.cnt.underlying.getOrElse(k, Zero) => Ord.Gt
       case (Ord.Eq, k) if cnt.underlying.getOrElse(k, Zero) < other.cnt.underlying.getOrElse(k, Zero) => Ord.Lt
       case (Ord.Lt, k) if cnt.underlying.getOrElse(k, Zero) > other.cnt.underlying.getOrElse(k, Zero) => Ord.Cc
       case (Ord.Gt, k) if cnt.underlying.getOrElse(k, Zero) < other.cnt.underlying.getOrElse(k, Zero) => Ord.Cc
-      case (ord, _) =>  ord
+      case (ord, _)                                                                                   => ord
     }
   }
 }

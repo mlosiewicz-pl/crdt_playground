@@ -21,10 +21,7 @@ class GCounterSpec extends AnyFlatSpec with Matchers with CRDTBehaviors {
 
   it should behave like lawfulCRDT[GCounter[String]](
     () => GCounter.empty[String],
-    cnt => {
-      val replica = Gen.oneOf(Seq("1", "2", "3")).sample.get
-      cnt.inc(replica)
-    }
+    Gen.oneOf(Seq("1", "2", "3")).map(r => cnt => cnt.inc(r))
   )
 
 }

@@ -1,7 +1,7 @@
 package com.upscaled.crdt
 
 object VClock {
-  def empty[ReplicaId] = new VClock[String]()
+  def empty[ReplicaId] = new VClock[ReplicaId]()
 
 }
 

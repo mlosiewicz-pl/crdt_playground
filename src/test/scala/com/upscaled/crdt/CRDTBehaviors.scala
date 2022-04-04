@@ -13,10 +13,11 @@ trait CRDTBehaviors { this: AnyFlatSpec with Matchers =>
   implicit val generatorDrivenConfig: Configuration.PropertyCheckConfiguration =
     PropertyCheckConfiguration(minSize = 100)
 
-  def lawfulCRDT[T <: CRDT[T]](zero: () => T, op: T => T) = {
+  def lawfulCRDT[T <: CRDT[T]](zero: () => T, op: Gen[T => T]) = {
     implicit val gen: Gen[T] = for {
       i <- Gen.posNum[Int]
-      crdt = (0 to i).foldLeft(zero())((v, _) => op(v))
+      ops: List[T => T] <- Gen.listOfN(i, op)
+      crdt = ops.foldRight(zero())(_(_))
     } yield crdt
 
     implicit val arb: Arbitrary[T] = Arbitrary(gen)
@@ -29,6 +30,12 @@ trait CRDTBehaviors { this: AnyFlatSpec with Matchers =>
 
     it should "satisfy associativity (x • y) • z =  x • (y • z)" in {
       forAll { (x: T, y: T, z: T) =>
+//        println(
+//          s"""
+//             |x = $x
+//             |y = $y
+//             |z = $z
+//             |""".stripMargin)
         (x.merge(y)).merge(z) should equal(x.merge((y.merge(z))))
       }
     }

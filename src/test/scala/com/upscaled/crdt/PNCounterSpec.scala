@@ -21,19 +21,16 @@ class PNCounterSpec extends AnyFlatSpec with Matchers with CRDTBehaviors {
 
   it should behave like lawfulCRDT[PNCounter[String]](
     () => PNCounter.empty[String],
-    cnt => {
-      val replica = Gen.oneOf(Seq("1", "2", "3")).sample.get
-      val op = Gen
+    for {
+      replica <- Gen.oneOf(Seq("1", "2", "3"))
+      op <- Gen
         .oneOf[(PNCounter[String], String) => PNCounter[String]](
           Seq(
             (c: PNCounter[String], r: String) => c.inc(r),
             (c: PNCounter[String], r: String) => c.dec(r)
           )
         )
-        .sample
-        .get
-      op(cnt, replica)
-    }
+    } yield cnt => op(cnt, replica)
   )
 
 }

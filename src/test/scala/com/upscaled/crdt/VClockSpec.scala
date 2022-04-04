@@ -18,10 +18,7 @@ class VClockSpec extends AnyFlatSpec with Matchers with CRDTBehaviors{
 
   it should behave like lawfulCRDT[VClock[String]](
     () => VClock.empty[String],
-    cnt => {
-      val replica = Gen.oneOf(Seq("1", "2", "3")).sample.get
-      cnt.inc(replica)
-    }
+    Gen.oneOf(Seq("1", "2", "3")).map(r => cnt => cnt.inc(r))
   )
 
 }

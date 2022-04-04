@@ -5,8 +5,7 @@ object GCounter {
 }
 
 final case class GCounter[ReplicaId] private[crdt] (
-    private[crdt] val underlying: Map[ReplicaId, BigInt] =
-      Map.empty[ReplicaId, BigInt]
+    private[crdt] val underlying: Map[ReplicaId, BigInt] = Map.empty[ReplicaId, BigInt]
 ) extends CRDT[GCounter[ReplicaId]] {
 
   def value: BigInt = underlying.values.sum

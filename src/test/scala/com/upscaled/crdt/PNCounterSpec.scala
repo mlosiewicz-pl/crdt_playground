@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 
 class PNCounterSpec extends AnyFlatSpec with Matchers with CRDTBehaviors {
 
-  "A counter" should "honour incremenets and decrements" in {
+  "A counter" should "honour increments and decrements" in {
     val c1 = PNCounter.empty[String]
     c1.inc("1").dec("2").value should equal(0)
   }
